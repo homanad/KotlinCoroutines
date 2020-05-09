@@ -59,13 +59,6 @@ https://github.com/Kotlin/kotlinx.coroutines/tree/master/kotlinx-coroutines-core
   * produce: sử dụng cho những coroutines mà nó produce a stream of elements. Builder này trả về instance của ReceiveChannel
   * runblocking: Trong Android Development, chúng ta sử dụng runblocking chủ yếu cho testing, builder này sẽ block thread cho đến khi nó được thực thi xong, builder này trả về type T
 
-
-### Structured Concurrency
-* Set of language features and best practices introduced for Kotlin coroutines to avoid coroutines leak and manage coroutines productively
-
-### Unstructured Concurrency
-
-
 ## Switch the thread of a coroutine
 --- Demo Switch thread of a coroutine ---
 
@@ -102,3 +95,31 @@ https://github.com/Kotlin/kotlinx.coroutines/tree/master/kotlinx-coroutines-core
 * Nhưng với Kotlin coroutines, chúng ta có thể làm được nó một cách đơn giản.
 
 --- Demo Async - Await
+
+## Unstructured Concurrency vs. Structured Concurrency
+* Trong trường hợp ta muốn chạy nhiều coroutines cùng lúc trong một suspending function và nhận về kết qủa, có 2 cách để làm được điều đó, chúng ta gọi là Structured Concurrency và Unstructured Concurrency
+### Unstructured Concurrency
+* Đây là cách ứng dụng sai
+--- Demo StructuredConcurrency (Un)---
+* Unstructured Concurrency sẽ không đảm bảo hoàn thành tất cả tasks của suspending function trước khi trả về.
+* Ở đây, thực tế thì child coroutines (delay 1000) vẫn chạy, ngay cả sau khi coroutine cha đã hoàn thành (setText), kết quả dẫn tới là những lỗi không đoán trước, đó là với trường hợp sử dụng launch builder như đã demo.
+* Với async builder và sử dụng await function thì có thể nhận được kết quả như mong muốn, nhìn qua thì có vẻ như nó chạy như mong muốn, nhưng ở đây vẫn có vấn đề xảy ra. Trong Android, nếu có một error xảy ra trong function, nó sẽ ném ra exception, vì vậy ta có thể catch exception trong những hàm gọi nó và xử lý.
+Trong Unstructured Concurrency, dù sử dụng launch hay async builder, chúng ta đều không thể xử lý exception đúng cách. Vì vậy, mặc dù nó có thể chạy đúng trong một số trường hợp, nhưng thực tế khuyến khích không nên sử dụng.
+
+### Structured Concurrency
+<!--* Set of language features and best practices introduced for Kotlin coroutines to avoid coroutines leak and manage coroutines productively-->
+* Tất cả những vấn đề phát sinh ở Unstructured Concurrency đều có thể dễ dàng giải quyết với coroutineScope function, chú ý ở đây coroutineScope khác CoroutineScope
+  * CoroutineScope là một interface
+  * coroutineScope là một suspending function cho phép chúng ta tạo ra các child scope trong một phạm vi coroutine nhất định, coroutine scope này đảm bảo sự hoàn thành của tasks khi suspending function trả về kết quả.
+
+--- Demo StructuredConcurrency ---
+
+* Khi sử dụng coroutineScope, nó sẽ đảm bảo hoàn tành tất cả các tasks trong child scope được cung cấp bởi nó trước khi return (ở đây là launch và async)
+* Trong ví dụ trước, kết quả ta nhận được là 70, bởi vì vấn đề xảy ra với unstructured concurrency.
+* Ở ví dụ này, kết quả phải là 120
+
+* Ví dụ này chính là best recommended practice, khi chúng ta có nhiều coroutines, chúng ta luôn luôn nên start Dispatcher.Main, với CoroutineScope interface, và bên trong suspending function, ta nên sử dụng coroutineScope function để cung cấp child scope
+* =>
+  * Structured Concurrency sẽ đảm bảo hoàn thành tất cả các tasks chạy bởi coroutines bên trong child scope trước khi suspending function return. Thực tế, trong coroutineScope, nó đợi child coroutines hoàn thành, không chỉ vậy, nó còn có một lợi ích khác. Khi errors xảy ra, exception được ném ra, structured concurrency cũng đảm bảo được việc thống báo đến caller function. Vì vậy ta có thể dễ dàng xử lý, chúng ta cũng có thể sử dụng structured concurrency để cancel chúng nếu cần.
+  * Nếu chúng ta cancel toàn bộ child scope, tất cả những gì xảy ra bên trong nó đều bị cancel.
+  * Ta cũng có thể cancel coroutine một cách độc lập => next lesson

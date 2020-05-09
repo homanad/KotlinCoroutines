@@ -17,8 +17,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        implementCoroutines()
-        workOnMainThread()
+        implementCoroutines()
+//        workOnMainThread()
 
     }
 
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         for (i in 1..200000000) {
             Log.i(
                 "WhyCoroutines?",
-                "Download in progress: $i in 200000, on ${Thread.currentThread().name} thread"
+                "Download in progress: $i in 200000000, on ${Thread.currentThread().name} thread"
             )
         }
     }

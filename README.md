@@ -67,5 +67,38 @@ https://github.com/Kotlin/kotlinx.coroutines/tree/master/kotlinx-coroutines-core
 
 
 ## Switch the thread of a coroutine
+--- Demo Switch thread of a coroutine ---
 
+### Suspending functions
+* In Kotlin coroutines, whenever a coroutine is suspended, the current thread will stack frame of the function is copied and saved in the memory.
+* When the function resumes after completing its task, the stack fram is copied back from where it was saved and starts running again.
+* Kotlin coroutines API cung cấp rất nhiều function để giúp ta làm việc với nó đơn giản hơn
+  * withContext():
+  * withTimeout():
+  * withTimeoutOrNull():
+  * join():
+  * delay():
+  * await():
+  * supervisorScope:
+  * coroutineScope:
+  * and more...
+  * Một số thư viện khác như Room hay Retrofit cũng cung cấp những suspending functions để hỗ trợ công việc với coroutines
+* Notes:
+  * Một suspending function chỉ có thể được gọi trong một suspending function
+  * Suspending function được sử dụng như một "label" cho những hàm nặng và tốn nhiều thời gian chạy.
+  * Coroutine có thể gọi cả suspending function và regular function
+  * Suspending function không block thread
 
+## Async & Await
+* Example:
+  * Task 1: 10s
+  * Task 2: 15s
+  * Task 3: 8s
+  * Task 4: 12s
+    * Với synchronous code, chúng ta sẽ phải đợi ít nhất 10 + 15 + 8 + 12 = 45s để nhận được kết quả cuối cùng
+    * Nhưng với asynchronous, chúng ta sẽ chỉ phải đợi khoảng 15s là có thể nhận được kết quả.
+
+* Decomposition Parallel, thông thường, để viết được nó sẽ rất phức tạp, khó viết, khó đọc, khó bảo trì
+* Nhưng với Kotlin coroutines, chúng ta có thể làm được nó một cách đơn giản.
+
+--- Demo Async - Await

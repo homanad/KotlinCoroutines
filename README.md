@@ -122,4 +122,8 @@ Trong Unstructured Concurrency, dù sử dụng launch hay async builder, chúng
 * =>
   * Structured Concurrency sẽ đảm bảo hoàn thành tất cả các tasks chạy bởi coroutines bên trong child scope trước khi suspending function return. Thực tế, trong coroutineScope, nó đợi child coroutines hoàn thành, không chỉ vậy, nó còn có một lợi ích khác. Khi errors xảy ra, exception được ném ra, structured concurrency cũng đảm bảo được việc thống báo đến caller function. Vì vậy ta có thể dễ dàng xử lý, chúng ta cũng có thể sử dụng structured concurrency để cancel chúng nếu cần.
   * Nếu chúng ta cancel toàn bộ child scope, tất cả những gì xảy ra bên trong nó đều bị cancel.
-  * Ta cũng có thể cancel coroutine một cách độc lập => next lesson
+  * Ta cũng có thể cancel coroutine một cách độc lập => next
+
+### View Model scope
+* Following Android Architecture Component - MVVM Architecture
+* 

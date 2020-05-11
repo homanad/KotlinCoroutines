@@ -1,4 +1,4 @@
-package com.hmman.viewmodelscope
+package com.example.livedatabuilder
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -15,12 +15,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+//        viewModel.getUsers()
         viewModel.users.observe(this, Observer { users ->
             users.forEach {
                 Log.i("USERDATA", "User: ID - ${it.id}, NAME - ${it.name}")
             }
         })
-
-        viewModel.getUserData()
     }
 }

@@ -2,7 +2,7 @@
 
 ## What
 
-* Thông thường, có 2 loại multitasking mothods để quản lí multiple processes:
+* Thông thường, có 2 loại multitasking methods để quản lí multiple processes:
   * OS quản lí việc chuyển đổi giữa các processes
   * "Cooperative Multitasking", mỗi processes quản lý behavior của chính nó
 
@@ -28,9 +28,9 @@
 
 ## Coroutines vs. Thread
 * Coroutine và Thread có giôngs nhau? - KHÔNG
-* Chúng ta có Main thread (hay còn gọi là UI Thread), ngoài ra chungs ta còn có khác background worker thread, nhưng thread không giống coroutines.
-* Bất cứ thread nào cungx có thể có nhiều coroutines được thực hiện trong cùng một lúc.
-* Coroutines chỉ là "separate processors" chạy trên một thread, thậm chỉ có thể lên đến 100 coroutines chạy cungf 1 lúc
+* Chúng ta có Main thread (hay còn gọi là UI Thread), ngoài ra chúng ta còn có khác background worker thread, nhưng thread không giống coroutines.
+* Bất cứ thread nào cũng có thể có nhiều coroutines được thực hiện trong cùng một lúc.
+* Coroutines chỉ là "separate processors" chạy trên một thread, thậm chỉ có thể lên đến 100 coroutines chạy cùng 1 lúc
 * Nhưng mặc định, coroutines không giúp ta theo dõi chúng, hoặc theo dõi những công việc được hoàn thành bởi chúng. Do đó nếu ta không quản lý cẩn thận, chúng có thể dẫn tới leak memory. Nhưng những nhà phát triển Kotlin đã sửa được vấn đề này
 * Trong Kotlin coroutines, chúng ta phải chạy tất cả coroutines trong một scope, sử dụng properties trong suốt scope, chúng ta có thể dễ dàng theo dõi coroutines, cancel và xử lý errors hoặc exceptions thrown bởi chúng
 
@@ -42,12 +42,12 @@
 * Cả 2 Scope này đều được mô tả như một reference cho coroutine context
 ### Context - Dispatchers
 * Dispatcher mô tả một loại của thread nơi mà coroutines sẽ được chạy
-* Trong Kotlin Android structured concurrency, nó luôn được khuyến khích sử dụng main thread sau đó chuyển xuôngs background thread
+* Trong Kotlin Android structured concurrency, nó luôn được khuyến khích sử dụng main thread sau đó chuyển xuống background thread
   * Dispatchers.Main: coroutines sẽ được chạy trên main thread (UI thread), chúng ta chỉ sử dụng main dispatcher cho những tác vụ nhỏ, nhẹ và có tác động đến UI như: call to a ui function, call to a suspending function or to get updates from the livedata. Trong structured concurrency, Recommended best practice là khởi chạy coroutines ở main thread và sau đó chuyển sang background thread.
   * Dispatchers.IO: coroutines sẽ được chạy dưới background thread "from a shared pool of on-demand created threads". Chúng ta sẽ dùng IO dispatcher để làm việc với local database, giao tiếp với network và làm việc với files.
   * Dispatchers.Default: được sử dụng cho CPU intensive tasks như sắp xếp một large list, parse một huge JSON file,...
   * Dispatchers.Unconfined: là một dispatcher được sử dụng với GlobalScope, nếu ta sử dụng Unconfined, coroutines sẽ được chạy trên current thread, nhưng nếu như chúng đã suspended hoặc resumed, nó sẽ chạy trên thread mà có suspending function đang chạy. Dispatcher này không được khuyến khích sử dụng cho Android Development.
-* Ngoài 4 dispatcher này, coroutines api cũng tạo điều kiện cho chúng ta chuyển đổi từ "executors" thành dispatchers", cũng như tạo ra các custom dispatcher
+* Ngoài 4 dispatcher này, coroutines api cũng tạo điều kiện cho chúng ta chuyển đổi từ "executors" thành "dispatchers", cũng như tạo ra các custom dispatcher
 * Tổng kết, trong android development, sử dụng phổ biến nhất là Main và IO
 ### Coroutines Builder
 
@@ -124,6 +124,22 @@ Trong Unstructured Concurrency, dù sử dụng launch hay async builder, chúng
   * Nếu chúng ta cancel toàn bộ child scope, tất cả những gì xảy ra bên trong nó đều bị cancel.
   * Ta cũng có thể cancel coroutine một cách độc lập => next
 
-### View Model scope
+### viewModelScope
 * Following Android Architecture Component - MVVM Architecture
-* 
+* Sử dụng viewModelScope trong ViewModel:
+  * Điều này giúp cho bất cứ coroutines nào chạy trong scope này đều được tự động hủy khi ViewModel isCleared mà không cần override onCleared()
+  * Điều này cũng thuận lợi khi ta muốn hoàn thành coroutines chỉ khi ViewModel hoạt động.
+
+### lifecycleScope
+* Google cũng giới thiệu thêm một scope tiện dụng được gọi là lifecycleScope, một lifecycleScope được định nghĩa cho mỗi Lifecycle object
+* Bất cứ coroutines nào chạy trong scope này đều sẽ cancel khi Lifecycle destroyed
+* Đôi khi chúng ta cần tạo coroutines trong objects với một lifecycle, như activities hay fragments
+* Tất cả coroutines sẽ được cancel tại onDestroy (Activity và Fragment)
+* Ở đây, ta có thêm 3 builder mới:
+  * launchWhenCreated:  khi có những long running task chỉ xảy ra trong lifecycle của activity hoặc fragment, coroutine này sẽ chạy khi activity hoặc fragment created vào lần đầu tiên
+  * launchWhenStarted: coroutine này sẽ chạy khi activity hoặc fragment started
+  * launchWhenResumed: chạy coroutine ngay khi app is up and running
+
+### Live Data Builder
+* block mới này sẽ tự động thực thi khi live data hoạt động, nó tự động quyết định khi nào stop và cancel coroutines bên trong nó dựa trên lifecycle owner.
+* Bên trong Live Data building block, ta có thể sử dụng emit() function để set value cho LiveData

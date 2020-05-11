@@ -1,6 +1,6 @@
 # Coroutines
 
-## What
+## What is Coroutines
 
 * Thông thường, có 2 loại multitasking methods để quản lí multiple processes:
   * OS quản lí việc chuyển đổi giữa các processes
@@ -12,7 +12,8 @@
 * Một thread có thể chạy nhiều coroutines, một coroutine cũng có thể được chuyển qua lại giữa các thread, có thể suspend ở một thread và resume ở một thread khác.
 
 
-##  Why
+##  Why we need Coroutines
+
 * Tất cả những "painful task" được thực hiện bằng RxJava, AsyncTask hoặc những methods khác như executors, HandlerThreads và IntentServices đều được thực hiện một cách đơn giản bằng coroutines
 * Coroutines API cũng cho phép viết asynchronous code trong một sequential manner.
 * Tránh những unneccessary boilerplate code đến từ các callbacks và làm cho code readable và maintainable.
@@ -130,16 +131,22 @@ Trong Unstructured Concurrency, dù sử dụng launch hay async builder, chúng
   * Điều này giúp cho bất cứ coroutines nào chạy trong scope này đều được tự động hủy khi ViewModel isCleared mà không cần override onCleared()
   * Điều này cũng thuận lợi khi ta muốn hoàn thành coroutines chỉ khi ViewModel hoạt động.
 
+--- Demo ViewModelScope ---
+
 ### lifecycleScope
 * Google cũng giới thiệu thêm một scope tiện dụng được gọi là lifecycleScope, một lifecycleScope được định nghĩa cho mỗi Lifecycle object
 * Bất cứ coroutines nào chạy trong scope này đều sẽ cancel khi Lifecycle destroyed
 * Đôi khi chúng ta cần tạo coroutines trong objects với một lifecycle, như activities hay fragments
 * Tất cả coroutines sẽ được cancel tại onDestroy (Activity và Fragment)
 * Ở đây, ta có thêm 3 builder mới:
-  * launchWhenCreated:  khi có những long running task chỉ xảy ra trong lifecycle của activity hoặc fragment, coroutine này sẽ chạy khi activity hoặc fragment created vào lần đầu tiên
+  * launchWhenCreated: khi có những long running task chỉ xảy ra trong lifecycle của activity hoặc fragment, coroutine này sẽ chạy khi activity hoặc fragment created vào lần đầu tiên
   * launchWhenStarted: coroutine này sẽ chạy khi activity hoặc fragment started
   * launchWhenResumed: chạy coroutine ngay khi app is up and running
+
+--- Demo LifecycleScope ---
 
 ### Live Data Builder
 * block mới này sẽ tự động thực thi khi live data hoạt động, nó tự động quyết định khi nào stop và cancel coroutines bên trong nó dựa trên lifecycle owner.
 * Bên trong Live Data building block, ta có thể sử dụng emit() function để set value cho LiveData
+
+--- Demo Livedata Builder ---

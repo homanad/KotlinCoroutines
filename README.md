@@ -41,6 +41,7 @@
 * Trong Kotlin coroutines, chúng ta còn có một scope khác là GlobalScope. GlobalScope sử dụng cho việc chạy các top-level coroutines - which are operating on the whole application lifetime.
 * Trong android development, chúng ta rất hiếm khi sử dụng GLobalScope
 * Cả 2 Scope này đều được mô tả như một reference cho coroutine context
+
 ### Context - Dispatchers
 * Dispatcher mô tả một loại của thread nơi mà coroutines sẽ được chạy
 * Trong Kotlin Android structured concurrency, nó luôn được khuyến khích sử dụng main thread sau đó chuyển xuống background thread
@@ -59,6 +60,15 @@ https://github.com/Kotlin/kotlinx.coroutines/tree/master/kotlinx-coroutines-core
   * async: Nếu ta muốn nhận được kết quả trả về, nên sử dụng async builder, không chỉ vậy, điều chính của async builder là cho phép chạy coroutines một cách song song, async builder cũng sẽ không block current thread (giống launch builder). Builder này sẽ return một instance của Deferred của type của result. Thực tế, deferred interface là một extension của job interface, vì vậy ta có thể sử dụng nó như một Jo và cancel coroutine. Nếu kết quả trả về của chungs ta là một String value. để lấy đưuọc dữ liệu từ một deferred object, chúng ta phải gọi await() function, async cungx là một trong những builder được sử dụng phổ biến nhất
   * produce: sử dụng cho những coroutines mà nó produce a stream of elements. Builder này trả về instance của ReceiveChannel
   * runblocking: Trong Android Development, chúng ta sử dụng runblocking chủ yếu cho testing, builder này sẽ block thread cho đến khi nó được thực thi xong, builder này trả về type T
+
+#### Job
+* Giữ thông tin của coroutine, job cung cấp các phương thức như cancel(), join()
+  * cancel(): cancel coroutine, điều đặc biệt ở đây là hàm cancel chỉ set lại property isActive = false, nhưng coroutine vẫn tiếp tục chạy, có 2 cách để thực sự dừng coroutine đã bị gọi cancel:
+    * check property isActive trước khi thực hiện tác vụ
+    * gọi một suspending function bất kì trước khi thực hiện tác vụ, hàm suspending có khả năng check xem coroutine có còn active hay không, nếu không nó sẽ không thực hiện những dòng sau.
+  * join(): khi ta gọi join tức là thì coroutine phải chạy xong tiến trình mới tiếp tục
+  * khối finally: nếu coroutine bị cancel, nó sẽ tìm tới khối finally để chạy. Ta có thể tận dụng đặc điểm này để đóng hết resource trước khi coroutine bị hủy. Quay lại ví dụ với cancel(), nếu ta đặt 1 suspending function (ví dụ với delay()) trong khối finally, coroutine sẽ dừng ngay tại đây mà không chạy tiếp các dòng sau.
+  * NonCancellable coroutine: với withContext suspending function, ta có thể truyền vào context là NonCancellable để khiến nó chạy kể cả đã cancel hay được check lại với một suspending function.
 
 ## Switch the thread of a coroutine
 --- Demo Switch thread of a coroutine ---
@@ -124,6 +134,28 @@ Trong Unstructured Concurrency, dù sử dụng launch hay async builder, chúng
   * Structured Concurrency sẽ đảm bảo hoàn thành tất cả các tasks chạy bởi coroutines bên trong child scope trước khi suspending function return. Thực tế, trong coroutineScope, nó đợi child coroutines hoàn thành, không chỉ vậy, nó còn có một lợi ích khác. Khi errors xảy ra, exception được ném ra, structured concurrency cũng đảm bảo được việc thống báo đến caller function. Vì vậy ta có thể dễ dàng xử lý, chúng ta cũng có thể sử dụng structured concurrency để cancel chúng nếu cần.
   * Nếu chúng ta cancel toàn bộ child scope, tất cả những gì xảy ra bên trong nó đều bị cancel.
   * Ta cũng có thể cancel coroutine một cách độc lập => next
+
+### Exception trong Coroutines
+* Với launch:
+  * Khi throw Exception, coroutine sẽ stop và ném ra exception
+* Với async:
+  * Khác biệt một chút là, coroutine vẫn stop, nhưng exception k được ném ra
+  * Là vì exception được đóng gói vào Deferred, nên chỉ khi ta await() thì nó mới được ném ra.
+
+* Nhưng nếu ta chạy cùng lúc 100 coroutines, làm sao để bắt được hết exception?
+#### CoroutineExceptionHandler
+* CoroutineExceptionHandler được dùng như một generic catch block của tất cả coroutine.
+* Exception sẽ được bắt và trả về cho một hàm callback là override handleException(context: CoroutineContext, exception: Throwable)
+* Notes:
+  * CoroutineExceptionHandler không thể bắt được exception được đóng gói vào Deferred, và coroutine trong khối runBlocking, do đó ta phải tự catch
+
+* Như đã nói, khi gặp exception, coroutine sẽ tìm code trong khối finally để chạy, vậy nếu code trong finally cũng ném exception, thông thường, exception gặp đầu tiên sẽ được ném ra, lúc này các exception trong khối finally sẽ được suppressed, để in tất cả chúng ta có thể gọi exception.getSuppressed()
+  * Example: Caught java.io.IOException with suppressed [java.lang.ArithmeticException, java.lang.IndexOutOfBoundsException]
+
+### SupervisorJob
+* Thông thường, khi 1 coroutine con xảy ra Exception, tất cả các coroutine con khác cũng sẽ bị stop. Nếu muốn 1 coroutine con có xảy ra Exception thì các coroutine con khác vẫn hoạt động bình thường, ta có thể sử dụng SupervisorJob thay vì Job
+* Khi SupervisorJob cancel thì tất cả con của nó sẽ bị cancel
+* Ngoài ra, ta cũng có supervisorScope, tác dụng của nó tương tự như SupervisorJob
 
 ### viewModelScope
 * Following Android Architecture Component - MVVM Architecture

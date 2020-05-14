@@ -1,0 +1,2 @@
+rootProject.name='SupervisorJob'
+include ':app'

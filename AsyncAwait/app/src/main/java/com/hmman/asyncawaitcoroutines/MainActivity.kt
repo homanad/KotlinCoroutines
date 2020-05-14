@@ -13,7 +13,23 @@ class MainActivity : AppCompatActivity() {
 
         withoutAsyncAwait()
 //        withAsyncAwait()
+//        asyncBuilder()
 
+    }
+
+    private fun asyncBuilder() {
+        Log.i("getData", "start")
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val coroutine1 = CoroutineScope(Dispatchers.IO).async {
+                return@async +getData1()
+            }
+            val coroutine2 = CoroutineScope(Dispatchers.IO).async {
+                return@async +getData2()
+            }
+            val total = coroutine1.await() + coroutine2.await()
+            Log.i("getData", "data:  $total")
+        }
     }
 
     private fun withoutAsyncAwait() {

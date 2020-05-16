@@ -1,3 +1,63 @@
+# What is coroutines?
+## Overview
+## Kotlin coroutines
+
+# Why we need Kotlin coroutines?
+## Coroutines vs. Threads
+### Concurrency - Parrallel
+### Threads
+### Coroutines
+### Threads vs. Coroutines
+### Blocking vs. Non-blocking, asynchronous programming
+## Coroutines vs. Callbacks
+
+# New concepts
+## CoroutineScope - GlobalScope
+## Context
+### Dispatchers 
+### Job
+## Deferred
+## Builders 
+## Suspending functions
+# Exceptions handling
+## Basic catch
+## CoroutineExceptionHandler
+
+# Additionally supported components
+## SupervisorJob - supervisorScope
+## viewModelScope
+## lifecyclerScope
+### liveData Builder
+
+# Q&A
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Agenda
 * What is Coroutines?
 * Why we need Coroutines?
@@ -11,10 +71,10 @@
 * A software components
 * Kotlin coroutines
   * Sequence of well managed sub tasks
-  * Light weight thread
+  *   * Light weight thread
 
 # Why we need Coroutines?
-* Alternative to RxJava, AsyncTask,…
+* Alternative to RxJava, AsyncTask, Handler…
 * Avoid boilerplate code
 * Asynchronous programming in a sequential manner
 

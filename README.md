@@ -3,7 +3,7 @@
 ## What is Coroutines
 * Thông thường, có 2 loại multitasking methods để quản lí multiple processes:
   * OS quản lí việc chuyển đổi giữa các processes
-  * "Cooperative Multitasking", mỗi processes quản lý behavior của chính nó
+  * "Cooperative Multitasking", mỗi process quản lý behavior của chính nó
 * Coroutines là một software components tạo ra các sub coroutines cho Cooperative Multitasking
 * Coroutines được sử dụng lần đầu tiên vào năm 1958 cho assembly language; Python, Javascript, C# cũng đã sử dụng coroutines trong nhiều năm.
 * Trong Kotlin, coroutines được giới thiệu như một "Sequence of well managed sub tasks". Ở mức độ nào đó, coroutine có thể được xem như một Thread gọn nhẹ
@@ -88,9 +88,9 @@ fun makeNetworkRequest() {
 
 * Sử dụng coroutines để loại bỏ callbacks:
   * Callbacks là một cách tốt, tuy nhiên code sẽ nặng và khó đọc, khó debug.
-  * Kotlin coroutines sẽ chuyển cấu trúc callback thành code tuần tự, giúp dể đọc hơn.
+  * Kotlin coroutines sẽ chuyển cấu trúc callback thành code tuần tự, dễ đọc hơn.
   * Cả callback và coroutines đều cho ta một kết quả giống nhau
-  * Keyword suspend để đánh dấu function trở thành coroutine,
+  * Keyword suspend để đánh dấu function trở thành coroutine
   * Example:
 ` // Slow request with coroutines
 @UiThread
@@ -106,8 +106,6 @@ suspend fun makeNetworkRequest() {
 suspend fun slowFetch(): SlowResult { ... }`
 
   * Giữa callback với coroutine thì code của coroutine sẽ dễ đọc hơn, ngắn gọn và dễ hiểu hơn dù có cùng chung kết quả. Và nếu muốn nhiều task chạy hơn thì chỉ cần viết tiếp, không cần phải tạo nhiều callback.
-
-
 
 ## New concept
 ###  CoroutineScope

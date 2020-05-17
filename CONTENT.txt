@@ -2,9 +2,7 @@
 
 ## What is coroutines?
 
-* Nhắc một chút về Cooperative Multitasking và Preemptive Multitasking
-  * Preemptive Multitasking: OS sẽ thực hiện việc điều khiển việc chuyển đổi qua lại giữa các process
-  * Cooperative Multitasking: aka Non-preemptive multitasking, OS không cần phải thực hiện nhiệm vụ quản lý chuyển đổi các process, các process sẽ tự quản lý chính nó. NÓ được gọi là cooperative là vì tất cả chương trình phải hợp tác với nhau để lên lịch làm việc.
+* Nhắc một chút về Cooperative Multitasking
 * Coroutines là một software component tạo ra các sub coroutines cho
   Cooperative Multitasking
 * Trong Kotlin, coroutines được giới thiệu như một "sequence of well
@@ -12,6 +10,7 @@
 * Ở một mức độ nào đó, coroutine được xem như một thread gọn nhẹ.
 
 ## Why we need coroutines?
+
 * Coroutines vs. Threads
   * Concurrency - Parrallel
   * Threads
@@ -98,8 +97,7 @@
         hơn, ngắn gọn và dễ hiểu hơn dù có cùng chung kết quả. Và nếu
         muốn nhiều task chạy hơn thì chỉ cần viết tiếp, không cần phải
         tạo nhiều callback.
-  * Coroutines vs. AsyncTask - Handler
-    * Giải thích và demo
+
 # New concepts
 
 ## CoroutineScope - GlobalScope
@@ -164,7 +162,7 @@
 
 ## Deferred
 * Deferred là một non-blocking, có thể được hủy bỏ nếu được yêu cầu, về
-  cơ bản nó cũng đại diện cho Job, có chứa giá trị cho một
+  cơ bản nó cũng đại diện cho Job coroutine, có chứa giá trị cho một
   công việc tương ứng.
 * Sử dụng Deferred cho phép ta kết hợp
 
@@ -191,7 +189,7 @@
     biến nhất.
   * produce: sử dụng cho những coroutines mà nó tạo ra một luồng các
     elements. Builder này trả về instance của ReceiveChannel.
-  * runBlocking: Trong Android Development, chúng ta sử dụng
+  * runblocking: Trong Android Development, chúng ta sử dụng
     runblocking chủ yếu cho testing, builder này sẽ block thread cho
     đến khi nó được thực thi xong, builder này trả về type T.
 
@@ -215,10 +213,10 @@
   * Một số thư viện khác như Room hay Retrofit cũng cung cấp những
     suspending functions để hỗ trợ công việc với coroutines
 * Notes:
-  * Một suspending function sử dụng như một "label" cho những hàm nặng
-    và tốn nhiều thời gian chạy.
+  * Một suspending fun
   * Suspending function đ ction chỉ có thể được gọi trong một suspending
-    functionược
+    functionược sử dụng như một "label" cho những hàm nặng
+    và tốn nhiều thời gian chạy.
   * Coroutine có thể gọi cả suspending functions và regular functions
   * Suspending function không block thread
 
@@ -293,4 +291,5 @@
   để set value cho LiveData
 
 # Q&A
+
 

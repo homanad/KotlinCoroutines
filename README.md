@@ -4,7 +4,8 @@
 
 * Thông thường, có 2 loại multitasking methods để quản lí multiple
   processes:
-  * OS quản lí việc chuyển đổi giữa các processes
+  * "Preemptive Multitasking", OS quản lí việc chuyển đổi giữa các
+    processes
   * "Cooperative Multitasking", mỗi process quản lý behavior của chính
     nó
 * Coroutines là một software components tạo ra các sub coroutines cho
